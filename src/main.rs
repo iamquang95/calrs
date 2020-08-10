@@ -1,6 +1,8 @@
+use chrono::{Date, Local};
+
 mod date; 
 
 fn main() {
     println!("Hello, world!");
-    println!("{}", crate::date::get_today());
+    println!("{}", Local::today());
 }
