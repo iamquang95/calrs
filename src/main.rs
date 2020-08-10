@@ -1,8 +1,9 @@
 use chrono::{Date, Local};
 
-mod date; 
+mod calendar;
+mod date;
 
 fn main() {
     println!("Hello, world!");
-    println!("{}", Local::today());
+    calendar::render_calendar();
 }
