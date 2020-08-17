@@ -1,9 +1,6 @@
-use chrono::{Date, Local};
-
 mod calendar;
 mod date;
 
 fn main() {
-    println!("Hello, world!");
-    calendar::render_calendar();
+    calendar::render_calendar(4, 2020);
 }
