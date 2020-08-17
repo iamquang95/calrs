@@ -2,5 +2,5 @@ mod calendar;
 mod date;
 
 fn main() {
-    calendar::render_calendar(4, 2020);
+    calendar::render_calendar(8, 2020);
 }

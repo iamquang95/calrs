@@ -1,11 +1,13 @@
-use chrono::Datelike;
+use ansi_term::{Style, Colour};
 use chrono::TimeZone;
 use chrono::Weekday;
+use chrono::{Datelike, Local};
 use num_traits::cast::FromPrimitive;
 
 use crate::date;
 
 pub fn render_calendar(month: u32, year: i32) {
+  let today = Local::today();
   let first_day = chrono::Local.ymd(year, month, 1);
   let native_today = first_day.naive_local();
   let days_of_month = date::get_days_of_month(native_today);
@@ -56,13 +58,32 @@ pub fn render_calendar(month: u32, year: i32) {
   for day in calendar {
     match day.date {
       None => print!("     "),
-      Some(d) => print!("{:5}", d),
+      Some(d) => {
+        if today.day() == d && today.month() == month && today.year() == year {
+          print!("{space: <width$}{date}", space="", width=5-num_of_char(d), date=Colour::Black.bold().on(Colour::White).paint(format!("{}", d)))
+        } else {
+          print!("{:5}", d)
+        }
+      }
     }
     if day.weekday == Weekday::Sun {
       println!();
     }
   }
   println!();
+}
+
+fn num_of_char(n: u32) -> usize {
+  let mut cnt = 0;
+  let mut cur = n;
+  loop {
+    cur /= 10;
+    cnt += 1;
+    if cur == 0 {
+      break;
+    }
+  }
+  cnt
 }
 
 fn month_to_text(month: u32) -> String {
