@@ -49,19 +49,24 @@ pub fn run() {
         let (new_month, new_year) = decrease_month_year(month, year);
         month = new_month;
         year = new_year;
-      },
+      }
       Key::Right => {
         let (new_month, new_year) = increase_month_year(month, year);
         month = new_month;
         year = new_year;
-      },
+      }
       Key::Backspace => {
         month = today.month();
-        year = today.year(); 
-      },
+        year = today.year();
+      }
       _ => {}
     }
-    println!("{}", calendar::render_calendar(month, year));
+    write!(
+      stdout,
+      "{}{}",
+      termion::clear::All,
+      calendar::render_calendar(month, year)
+    ).unwrap();
     stdout.flush().unwrap();
   }
 

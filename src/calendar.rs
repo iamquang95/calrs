@@ -8,55 +8,21 @@ use crate::date;
 
 pub fn render_calendar(month: u32, year: i32) -> String {
   let today = Local::today();
-  let first_day = chrono::Local.ymd(year, month, 1);
-  let native_today = first_day.naive_local();
-  let days_of_month = date::get_days_of_month(native_today);
-
-  let days: Vec<Day> = (1..=days_of_month)
-    .map(|day| {
-      let day = native_today
-        .with_day(day as u32)
-        .expect("failed to get day");
-      Day {
-        date: Some(day.day()),
-        weekday: day.weekday(),
-      }
-    })
-    .collect();
-
-  let pre_month: Vec<Day> = (0..days[0].weekday.num_days_from_monday())
-    .map(|day| {
-      let weekday = Weekday::from_i64(day as i64).expect("failed to convert to week day");
-      Day {
-        date: None,
-        weekday: weekday,
-      }
-    })
-    .collect();
-
-  let post_month: Vec<Day> = (0..days[0].weekday.num_days_from_monday())
-    .map(|day| {
-      let weekday = Weekday::from_i64(day as i64).expect("failed to convert to week day");
-      Day {
-        date: None,
-        weekday: weekday,
-      }
-    })
-    .collect();
-
-  let calendar: Vec<Day> = vec![pre_month, days, post_month]
-    .into_iter()
-    .flatten()
-    .collect();
 
   let mut result = String::from("");
 
-  result.push_str(&format!("{: <13} {}, {}\r\n", "", month_to_text(month), year));
+  result.push_str(&format!(
+    "{: <13} {}, {}\r\n",
+    "",
+    month_to_text(month),
+    year
+  ));
   for day in 0..7 {
     let weekday = Weekday::from_i64(day as i64).expect("failed to convert to week day");
     result.push_str(&format!("  {}", weekday));
   }
   result.push_str("\r\n");
+  let calendar = fill_calendar(month, year);
   for day in calendar {
     match day.date {
       None => result.push_str("     "),
@@ -82,7 +48,39 @@ pub fn render_calendar(month: u32, year: i32) -> String {
     }
   }
   result.push_str("\r\n");
-  return result;
+  result
+}
+
+fn fill_calendar(month: u32, year: i32) -> Vec<Day> {
+  let first_day = chrono::Local.ymd(year, month, 1);
+  let native_today = first_day.naive_local();
+  let days_of_month = date::get_days_of_month(native_today);
+  let days: Vec<Day> = (1..=days_of_month)
+    .map(|day| {
+      let day = native_today
+        .with_day(day as u32)
+        .expect("failed to get day");
+      Day {
+        date: Some(day.day()),
+        weekday: day.weekday(),
+      }
+    })
+    .collect();
+
+  let pre_month: Vec<Day> = (0..days[0].weekday.num_days_from_monday())
+    .map(|day| {
+      let weekday = Weekday::from_i64(day as i64).expect("failed to convert to week day");
+      Day {
+        date: None,
+        weekday: weekday,
+      }
+    })
+    .collect();
+
+  vec![pre_month, days]
+    .into_iter()
+    .flatten()
+    .collect()
 }
 
 fn num_of_char(n: u32) -> usize {
