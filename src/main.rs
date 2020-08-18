@@ -1,6 +1,5 @@
-mod calendar;
-mod date;
+use calrs::*;
 
 fn main() {
-    calendar::render_calendar(8, 2020);
+   run(); 
 }

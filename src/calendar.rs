@@ -1,4 +1,4 @@
-use ansi_term::{Style, Colour};
+use ansi_term::Colour;
 use chrono::TimeZone;
 use chrono::Weekday;
 use chrono::{Datelike, Local};
@@ -6,7 +6,7 @@ use num_traits::cast::FromPrimitive;
 
 use crate::date;
 
-pub fn render_calendar(month: u32, year: i32) {
+pub fn render_calendar(month: u32, year: i32) -> String {
   let today = Local::today();
   let first_day = chrono::Local.ymd(year, month, 1);
   let native_today = first_day.naive_local();
@@ -49,28 +49,40 @@ pub fn render_calendar(month: u32, year: i32) {
     .flatten()
     .collect();
 
-  println!("{: <13} {}, {}", "", month_to_text(month), year);
+  let mut result = String::from("");
+
+  result.push_str(&format!("{: <13} {}, {}\r\n", "", month_to_text(month), year));
   for day in 0..7 {
     let weekday = Weekday::from_i64(day as i64).expect("failed to convert to week day");
-    print!("  {}", weekday);
+    result.push_str(&format!("  {}", weekday));
   }
-  println!();
+  result.push_str("\r\n");
   for day in calendar {
     match day.date {
-      None => print!("     "),
+      None => result.push_str("     "),
       Some(d) => {
         if today.day() == d && today.month() == month && today.year() == year {
-          print!("{space: <width$}{date}", space="", width=5-num_of_char(d), date=Colour::Black.bold().on(Colour::White).paint(format!("{}", d)))
+          // TODO: There must be a better way to print this
+          result.push_str(&format!(
+            "{space: <width$}{date}",
+            space = "",
+            width = 5 - num_of_char(d),
+            date = Colour::Black
+              .bold()
+              .on(Colour::White)
+              .paint(format!("{}", d))
+          ))
         } else {
-          print!("{:5}", d)
+          result.push_str(&format!("{:5}", d))
         }
       }
     }
     if day.weekday == Weekday::Sun {
-      println!();
+      result.push_str("\r\n");
     }
   }
-  println!();
+  result.push_str("\r\n");
+  return result;
 }
 
 fn num_of_char(n: u32) -> usize {
